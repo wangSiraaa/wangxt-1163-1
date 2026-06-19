@@ -3,8 +3,13 @@ const db = require('../db');
 
 const router = express.Router();
 
+function sameId(a, b) {
+  if (a == null || b == null) return a === b;
+  return String(a) === String(b);
+}
+
 router.post('/', (req, res) => {
-  const { plan_id, engineer_id, engineer_name, signal_strength, signal_quality, audio_status, video_status, note, recorded_at } = req.body;
+  const { plan_id, engineer_id, engineer_name, signal_strength, signal_quality, audio_status, video_status, note, recorded_at, frequency_id } = req.body;
   if (!plan_id || !engineer_id || !engineer_name || signal_strength == null || !signal_quality) {
     return res.status(400).json({ error: '计划ID、工程师信息、信号强度和质量不能为空' });
   }
@@ -25,14 +30,21 @@ router.post('/', (req, res) => {
   if (plan.status === 'cancelled') {
     return res.status(400).json({ error: '已取消的直播计划不能记录信号' });
   }
+  if (plan.status === 'ended') {
+    return res.status(400).json({
+      error: '直播已结束，信号记录只读，不能新增记录',
+      code: 'RECORD_READ_ONLY'
+    });
+  }
 
+  const recordFrequencyId = frequency_id || plan.frequency_id;
   const info = db.prepare(`
-    INSERT INTO signal_records (plan_id, engineer_id, engineer_name, signal_strength, signal_quality, audio_status, video_status, note, recorded_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO signal_records (plan_id, engineer_id, engineer_name, signal_strength, signal_quality, audio_status, video_status, note, recorded_at, frequency_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     plan_id, engineer_id, engineer_name, signal_strength, signal_quality,
     audio_status || 'normal', video_status || 'normal', note || '',
-    recorded_at || new Date().toISOString()
+    recorded_at || new Date().toISOString(), recordFrequencyId
   );
 
   if (signal_quality) {
@@ -62,15 +74,19 @@ router.get('/', (req, res) => {
   const freqs = db.prepare('SELECT * FROM frequencies').all();
 
   const result = records.map(sr => {
-    const bp = plans.find(p => p.id === sr.plan_id);
-    const v = vehicles.find(x => x.id === bp?.vehicle_id);
-    const f = freqs.find(x => x.id === bp?.frequency_id);
+    const bp = plans.find(p => sameId(p.id, sr.plan_id));
+    const v = vehicles.find(x => sameId(x.id, bp?.vehicle_id));
+    const recordFreqId = sr.frequency_id || bp?.frequency_id;
+    const f = freqs.find(x => sameId(x.id, recordFreqId));
+    const isReadOnly = bp?.status === 'ended';
     return {
       ...sr,
-      plan_title: bp?.title, location: bp?.location,
+      plan_title: bp?.title, location: bp?.location, city: bp?.city,
       plan_start: bp?.start_time, plan_end: bp?.end_time,
+      plan_status: bp?.status,
       vehicle_name: v?.name, vehicle_code: v?.code,
-      frequency_code: f?.code, frequency: f?.frequency
+      frequency_code: f?.code, frequency: f?.frequency,
+      is_read_only: isReadOnly
     };
   });
   res.json(result);
@@ -84,15 +100,19 @@ router.get('/:id', (req, res) => {
   const plans = db.prepare('SELECT * FROM broadcast_plans').all();
   const vehicles = db.prepare('SELECT * FROM vehicles').all();
   const freqs = db.prepare('SELECT * FROM frequencies').all();
-  const bp = plans.find(p => p.id === record.plan_id);
-  const v = vehicles.find(x => x.id === bp?.vehicle_id);
-  const f = freqs.find(x => x.id === bp?.frequency_id);
+  const bp = plans.find(p => sameId(p.id, record.plan_id));
+  const v = vehicles.find(x => sameId(x.id, bp?.vehicle_id));
+  const recordFreqId = record.frequency_id || bp?.frequency_id;
+  const f = freqs.find(x => sameId(x.id, recordFreqId));
+  const isReadOnly = bp?.status === 'ended';
   res.json({
     ...record,
-    plan_title: bp?.title, location: bp?.location,
+    plan_title: bp?.title, location: bp?.location, city: bp?.city,
     plan_start: bp?.start_time, plan_end: bp?.end_time,
+    plan_status: bp?.status,
     vehicle_name: v?.name, vehicle_code: v?.code,
-    frequency_code: f?.code, frequency: f?.frequency
+    frequency_code: f?.code, frequency: f?.frequency,
+    is_read_only: isReadOnly
   });
 });
 

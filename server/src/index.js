@@ -20,6 +20,7 @@ const plansRouter = require('./routes/plans');
 const dispatchesRouter = require('./routes/dispatches');
 const signalsRouter = require('./routes/signals');
 const dashboardRouter = require('./routes/dashboard');
+const frequencySwitchRouter = require('./routes/frequency_switch_records');
 
 app.use('/api/users', usersRouter);
 app.use('/api/vehicles', vehiclesRouter);
@@ -28,6 +29,7 @@ app.use('/api/plans', plansRouter);
 app.use('/api/dispatches', dispatchesRouter);
 app.use('/api/signals', signalsRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/frequency-switches', frequencySwitchRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

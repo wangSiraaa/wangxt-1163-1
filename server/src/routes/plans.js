@@ -5,19 +5,31 @@ const router = express.Router();
 
 function nowIso() { return new Date().toISOString(); }
 
-function enrichPlan(plan, vehicles, freqs, dispatches, signals) {
+function enrichPlan(plan, vehicles, freqs, dispatches, signals, switchRecords) {
   if (!plan) return plan;
   const v = vehicles.find(x => x.id === plan.vehicle_id);
   const f = freqs.find(x => x.id === plan.frequency_id);
   const d = dispatches.find(x => x.plan_id === plan.id);
   const sig = (signals || []).filter(s => s.plan_id === plan.id)
     .sort((a, b) => (b.recorded_at || '').localeCompare(a.recorded_at || ''));
+  const switches = (switchRecords || []).filter(s => s.plan_id === plan.id)
+    .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+    .map(sw => {
+      const of = freqs.find(x => x.id === sw.old_frequency_id);
+      const nf = freqs.find(x => x.id === sw.new_frequency_id);
+      return {
+        ...sw,
+        old_frequency_code: of?.code, old_frequency: of?.frequency,
+        new_frequency_code: nf?.code, new_frequency: nf?.frequency
+      };
+    });
   return {
     ...plan,
     vehicle_name: v?.name, vehicle_code: v?.code, vehicle_status: v?.status,
     frequency_code: f?.code, frequency: f?.frequency, band: f?.band,
     dispatch_id: d?.id, dispatch_note: d?.note, dispatched_at: d?.created_at,
-    signal_records: sig
+    signal_records: sig,
+    frequency_switch_records: switches
   };
 }
 
@@ -28,6 +40,7 @@ router.get('/', (req, res) => {
   const freqs = db.prepare('SELECT * FROM frequencies').all();
   const dispatches = db.prepare('SELECT * FROM dispatches').all();
   const signals = db.prepare('SELECT * FROM signal_records').all();
+  const switchRecords = db.prepare('SELECT * FROM frequency_switch_records').all();
 
   let result = plans;
   if (status) result = result.filter(p => p.status === status);
@@ -36,7 +49,7 @@ router.get('/', (req, res) => {
   if (producer_id) result = result.filter(p => p.producer_id == producer_id);
   result.sort((a, b) => (b.start_time || '').localeCompare(a.start_time || ''));
 
-  result = result.map(p => enrichPlan(p, vehicles, freqs, dispatches, signals));
+  result = result.map(p => enrichPlan(p, vehicles, freqs, dispatches, signals, switchRecords));
   res.json(result);
 });
 
@@ -49,23 +62,51 @@ router.get('/:id', (req, res) => {
   const freqs = db.prepare('SELECT * FROM frequencies').all();
   const dispatches = db.prepare('SELECT * FROM dispatches').all();
   const signals = db.prepare('SELECT * FROM signal_records').all();
-  res.json(enrichPlan(plan, vehicles, freqs, dispatches, signals));
+  const switchRecords = db.prepare('SELECT * FROM frequency_switch_records').all();
+  res.json(enrichPlan(plan, vehicles, freqs, dispatches, signals, switchRecords));
 });
 
+function extractCity(location) {
+  if (!location) return '';
+  const cityMatch = location.match(/(北京|上海|广州|深圳|杭州|南京|成都|重庆|武汉|西安|天津|苏州|长沙|郑州|青岛|大连|厦门|济南|福州|合肥)/);
+  if (cityMatch) return cityMatch[1];
+  const firstPart = location.split(/[\/\-]/)[0].trim();
+  return firstPart || location;
+}
+
 router.post('/', (req, res) => {
-  const { title, location, start_time, end_time, producer_id, producer_name, description } = req.body;
+  const { title, location, start_time, end_time, producer_id, producer_name, description, is_temporary, city } = req.body;
   if (!title || !location || !start_time || !end_time || !producer_id || !producer_name) {
     return res.status(400).json({ error: '标题、地点、时间、制片信息不能为空' });
   }
   if (new Date(start_time) >= new Date(end_time)) {
     return res.status(400).json({ error: '开始时间必须早于结束时间' });
   }
+  const planCity = city || extractCity(location);
   const info = db.prepare(`
-    INSERT INTO broadcast_plans (title, location, start_time, end_time, producer_id, producer_name, description, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')
-  `).run(title, location, start_time, end_time, producer_id, producer_name, description || '');
+    INSERT INTO broadcast_plans (title, location, start_time, end_time, producer_id, producer_name, description, status, is_temporary, city)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
+  `).run(title, location, start_time, end_time, producer_id, producer_name, description || '', is_temporary ? 1 : 0, planCity);
   const plan = db._data.broadcast_plans.find(p => p.id === info.lastInsertRowid);
   res.status(201).json(plan);
+});
+
+router.post('/temporary', (req, res) => {
+  const { title, location, start_time, end_time, producer_id, producer_name, description, city, reason } = req.body;
+  if (!title || !location || !start_time || !end_time || !producer_id || !producer_name) {
+    return res.status(400).json({ error: '标题、地点、时间、制片信息不能为空' });
+  }
+  if (new Date(start_time) >= new Date(end_time)) {
+    return res.status(400).json({ error: '开始时间必须早于结束时间' });
+  }
+  const planCity = city || extractCity(location);
+  const now = nowIso();
+  const info = db.prepare(`
+    INSERT INTO broadcast_plans (title, location, start_time, end_time, producer_id, producer_name, description, status, is_temporary, city, temporary_reason, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', 1, ?, ?, ?)
+  `).run(title, location, start_time, end_time, producer_id, producer_name, description || '', planCity, reason || '临时插播', now);
+  const plan = db._data.broadcast_plans.find(p => p.id === info.lastInsertRowid);
+  res.status(201).json({ ...plan, message: '临时插播计划已创建，请尽快安排调度' });
 });
 
 router.put('/:id', (req, res) => {
@@ -211,6 +252,83 @@ router.post('/:id/end', (req, res) => {
     db._data = data;
   }
   res.json({ message: '直播已结束', id: req.params.id, status: 'ended' });
+});
+
+router.post('/:id/review', (req, res) => {
+  const plan = db.prepare('SELECT * FROM broadcast_plans WHERE id = ?').get(req.params.id);
+  if (!plan) {
+    return res.status(404).json({ error: '直播计划不存在' });
+  }
+  if (plan.status !== 'ended') {
+    return res.status(400).json({ error: '只有已结束的直播可以追加复盘和故障原因' });
+  }
+  const { review_notes, fault_reason, operator_id, operator_name } = req.body;
+  if (!review_notes && !fault_reason) {
+    return res.status(400).json({ error: '复盘内容或故障原因至少填写一项' });
+  }
+  const data = db._data;
+  const idx = data.broadcast_plans.findIndex(p => p.id == req.params.id);
+  if (idx >= 0) {
+    const existingReview = data.broadcast_plans[idx].review_notes || '';
+    const existingFault = data.broadcast_plans[idx].fault_reason || '';
+    const separator = existingReview && review_notes ? '\n\n' : '';
+    const faultSeparator = existingFault && fault_reason ? '\n\n' : '';
+    const timeTag = `[${nowIso()}]`;
+    const operatorTag = operator_name ? ` ${operator_name}:` : '';
+
+    data.broadcast_plans[idx] = {
+      ...data.broadcast_plans[idx],
+      review_notes: review_notes ? existingReview + separator + timeTag + operatorTag + ' ' + review_notes : existingReview,
+      fault_reason: fault_reason ? existingFault + faultSeparator + timeTag + operatorTag + ' ' + fault_reason : existingFault,
+      review_operator_id: operator_id || data.broadcast_plans[idx].review_operator_id,
+      review_operator_name: operator_name || data.broadcast_plans[idx].review_operator_name,
+      reviewed_at: nowIso(),
+      updated_at: nowIso()
+    };
+    db._data = data;
+  }
+  const updated = db.prepare('SELECT * FROM broadcast_plans WHERE id = ?').get(req.params.id);
+  res.json({
+    message: '复盘和故障原因已追加',
+    id: req.params.id,
+    review_notes: updated.review_notes,
+    fault_reason: updated.fault_reason
+  });
+});
+
+router.get('/:id/conflicts', (req, res) => {
+  const plan = db.prepare('SELECT * FROM broadcast_plans WHERE id = ?').get(req.params.id);
+  if (!plan) {
+    return res.status(404).json({ error: '直播计划不存在' });
+  }
+  const allPlans = db.prepare('SELECT * FROM broadcast_plans').all();
+  const vehicles = db.prepare('SELECT * FROM vehicles').all();
+  const freqs = db.prepare('SELECT * FROM frequencies').all();
+
+  const sameCityConflicts = allPlans
+    .filter(bp =>
+      bp.id != plan.id
+      && bp.city === plan.city
+      && bp.frequency_id === plan.frequency_id
+      && ['pending', 'dispatched', 'ongoing'].includes(bp.status)
+      && bp.start_time < plan.end_time
+      && bp.end_time > plan.start_time
+    )
+    .map(bp => {
+      const v = vehicles.find(x => x.id === bp.vehicle_id);
+      const f = freqs.find(x => x.id === bp.frequency_id);
+      return {
+        ...bp,
+        vehicle_name: v?.name, vehicle_code: v?.code,
+        frequency_code: f?.code, frequency: f?.frequency
+      };
+    });
+
+  res.json({
+    has_conflict: sameCityConflicts.length > 0,
+    same_city_conflicts: sameCityConflicts,
+    city: plan.city
+  });
 });
 
 module.exports = router;

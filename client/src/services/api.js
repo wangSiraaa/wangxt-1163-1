@@ -38,10 +38,13 @@ export const plansApi = {
   list: (params) => api.get('/plans', { params }),
   get: (id) => api.get(`/plans/${id}`),
   create: (data) => api.post('/plans', data),
+  createTemporary: (data) => api.post('/plans/temporary', data),
   update: (id, data) => api.put(`/plans/${id}`, data),
   cancel: (id) => api.post(`/plans/${id}/cancel`),
-  start: (id) => api.post(`/plans/${id}/start`),
-  end: (id) => api.post(`/plans/${id}/end`)
+  start: (id, data) => api.post(`/plans/${id}/start`, data),
+  end: (id) => api.post(`/plans/${id}/end`),
+  addReview: (id, data) => api.post(`/plans/${id}/review`, data),
+  getConflicts: (id) => api.get(`/plans/${id}/conflicts`)
 };
 
 export const dispatchesApi = {
@@ -56,6 +59,12 @@ export const signalsApi = {
   get: (id) => api.get(`/signals/${id}`),
   create: (data) => api.post('/signals', data),
   remove: (id) => api.delete(`/signals/${id}`)
+};
+
+export const frequencySwitchApi = {
+  list: (params) => api.get('/frequency-switches', { params }),
+  get: (id) => api.get(`/frequency-switches/${id}`),
+  create: (data) => api.post('/frequency-switches', data)
 };
 
 export const dashboardApi = {

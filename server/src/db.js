@@ -16,6 +16,7 @@ let db = {
   dispatches: [],
   signal_records: [],
   vehicle_maintenance: [],
+  frequency_switch_records: [],
   _seq: {
     users: 0,
     vehicles: 0,
@@ -23,7 +24,8 @@ let db = {
     broadcast_plans: 0,
     dispatches: 0,
     signal_records: 0,
-    vehicle_maintenance: 0
+    vehicle_maintenance: 0,
+    frequency_switch_records: 0
   }
 };
 
@@ -307,7 +309,8 @@ function initDb() {
   if (!db._seq) {
     db._seq = {
       users: 0, vehicles: 0, frequencies: 0, broadcast_plans: 0,
-      dispatches: 0, signal_records: 0, vehicle_maintenance: 0
+      dispatches: 0, signal_records: 0, vehicle_maintenance: 0,
+      frequency_switch_records: 0
     };
   }
 
@@ -335,14 +338,14 @@ function initDb() {
   });
 
   const defaultFreqs = [
-    { code: 'UHF-01', frequency: 470.5, band: 'UHF', description: 'UHF频段频道1' },
-    { code: 'UHF-02', frequency: 506.0, band: 'UHF', description: 'UHF频段频道2' },
-    { code: 'UHF-03', frequency: 542.0, band: 'UHF', description: 'UHF频段频道3' },
-    { code: 'UHF-04', frequency: 578.0, band: 'UHF', description: 'UHF频段频道4' },
-    { code: 'L-01', frequency: 1452.0, band: 'L-Band', description: 'L频段频道1' },
-    { code: 'L-02', frequency: 1500.5, band: 'L-Band', description: 'L频段频道2' },
-    { code: 'C-01', frequency: 4000.0, band: 'C-Band', description: 'C频段频道1' },
-    { code: 'C-02', frequency: 4200.0, band: 'C-Band', description: 'C频段频道2' }
+    { code: 'UHF-01', frequency: 470.5, band: 'UHF', description: 'UHF频段频道1', is_backup: false },
+    { code: 'UHF-02', frequency: 506.0, band: 'UHF', description: 'UHF频段频道2', is_backup: false },
+    { code: 'UHF-03', frequency: 542.0, band: 'UHF', description: 'UHF频段频道3', is_backup: true },
+    { code: 'UHF-04', frequency: 578.0, band: 'UHF', description: 'UHF频段频道4', is_backup: true },
+    { code: 'L-01', frequency: 1452.0, band: 'L-Band', description: 'L频段频道1', is_backup: false },
+    { code: 'L-02', frequency: 1500.5, band: 'L-Band', description: 'L频段频道2', is_backup: true },
+    { code: 'C-01', frequency: 4000.0, band: 'C-Band', description: 'C频段频道1', is_backup: false },
+    { code: 'C-02', frequency: 4200.0, band: 'C-Band', description: 'C频段频道2', is_backup: true }
   ];
   defaultFreqs.forEach(f => {
     db.frequencies.push({ id: nextId('frequencies'), ...f, created_at: nowIso() });

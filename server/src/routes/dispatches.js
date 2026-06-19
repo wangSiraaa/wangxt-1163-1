@@ -101,6 +101,24 @@ router.post('/', (req, res) => {
     });
   }
 
+  const sameCityFreqConflict = allPlans
+    .filter(bp => sameId(bp.frequency_id, frequency_id)
+      && ['pending', 'dispatched', 'ongoing'].includes(bp.status)
+      && !sameId(bp.id, plan_id)
+      && bp.city === plan.city
+      && bp.city != null && bp.city !== ''
+      && bp.start_time < plan.end_time && bp.end_time > plan.start_time)
+    .map(bp => enrichPlan(bp, vehicles, freqs));
+
+  if (sameCityFreqConflict.length > 0) {
+    return res.status(400).json({
+      error: `该频率在${plan.city || '同城市'}已有其他直播占用，频率冲突不能下发`,
+      code: 'FREQUENCY_SAME_CITY_CONFLICT',
+      conflicts: sameCityFreqConflict,
+      city: plan.city
+    });
+  }
+
   const tx = db.transaction(() => {
     db.prepare(`
       INSERT INTO dispatches (plan_id, vehicle_id, frequency_id, dispatcher_id, dispatcher_name, note)
