@@ -1,0 +1,184 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "producer1",
+      "name": "张制片",
+      "role": "producer",
+      "created_at": "2026-06-19T01:51:45.070Z"
+    },
+    {
+      "id": 2,
+      "username": "producer2",
+      "name": "李制片",
+      "role": "producer",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 3,
+      "username": "dispatcher1",
+      "name": "王调度",
+      "role": "dispatcher",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 4,
+      "username": "dispatcher2",
+      "name": "赵调度",
+      "role": "dispatcher",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 5,
+      "username": "engineer1",
+      "name": "陈工程师",
+      "role": "engineer",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 6,
+      "username": "engineer2",
+      "name": "刘工程师",
+      "role": "engineer",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    }
+  ],
+  "vehicles": [
+    {
+      "id": 1,
+      "code": "TRK-001",
+      "name": "1号高清转播车",
+      "status": "available",
+      "description": "8讯道高清转播车",
+      "created_at": "2026-06-19T01:51:45.071Z",
+      "updated_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 2,
+      "code": "TRK-002",
+      "name": "2号高清转播车",
+      "status": "available",
+      "description": "6讯道高清转播车",
+      "created_at": "2026-06-19T01:51:45.071Z",
+      "updated_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 3,
+      "code": "TRK-003",
+      "name": "3号4K转播车",
+      "status": "available",
+      "description": "12讯道4K转播车",
+      "created_at": "2026-06-19T01:51:45.071Z",
+      "updated_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 4,
+      "code": "TRK-004",
+      "name": "4号小型转播车",
+      "status": "available",
+      "description": "4讯道小型转播车",
+      "created_at": "2026-06-19T01:51:45.071Z",
+      "updated_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 5,
+      "code": "TRK-005",
+      "name": "5号卫星转播车",
+      "status": "maintenance",
+      "description": "卫星传输转播车-检修中",
+      "created_at": "2026-06-19T01:51:45.071Z",
+      "updated_at": "2026-06-19T01:51:45.071Z"
+    }
+  ],
+  "frequencies": [
+    {
+      "id": 1,
+      "code": "UHF-01",
+      "frequency": 470.5,
+      "band": "UHF",
+      "description": "UHF频段频道1",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 2,
+      "code": "UHF-02",
+      "frequency": 506,
+      "band": "UHF",
+      "description": "UHF频段频道2",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 3,
+      "code": "UHF-03",
+      "frequency": 542,
+      "band": "UHF",
+      "description": "UHF频段频道3",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 4,
+      "code": "UHF-04",
+      "frequency": 578,
+      "band": "UHF",
+      "description": "UHF频段频道4",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 5,
+      "code": "L-01",
+      "frequency": 1452,
+      "band": "L-Band",
+      "description": "L频段频道1",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 6,
+      "code": "L-02",
+      "frequency": 1500.5,
+      "band": "L-Band",
+      "description": "L频段频道2",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 7,
+      "code": "C-01",
+      "frequency": 4000,
+      "band": "C-Band",
+      "description": "C频段频道1",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    },
+    {
+      "id": 8,
+      "code": "C-02",
+      "frequency": 4200,
+      "band": "C-Band",
+      "description": "C频段频道2",
+      "created_at": "2026-06-19T01:51:45.071Z"
+    }
+  ],
+  "broadcast_plans": [
+    {
+      "id": 1,
+      "title": "测试标题",
+      "location": "测试地点",
+      "start_time": "2026-06-20T10:00:00Z",
+      "end_time": "2026-06-20T11:00:00Z",
+      "producer_id": 1,
+      "producer_name": "张制片",
+      "description": "描述",
+      "status": "pending"
+    }
+  ],
+  "dispatches": [],
+  "signal_records": [],
+  "vehicle_maintenance": [],
+  "_seq": {
+    "users": 6,
+    "vehicles": 5,
+    "frequencies": 8,
+    "broadcast_plans": 1,
+    "dispatches": 0,
+    "signal_records": 0,
+    "vehicle_maintenance": 0
+  }
+}

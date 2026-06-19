@@ -1,0 +1,18 @@
+{
+  "name": "live-broadcast-coordination",
+  "version": "1.0.0",
+  "description": "电视台直播车频率协调系统",
+  "private": true,
+  "scripts": {
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "smoke": "bash scripts/smoke.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
