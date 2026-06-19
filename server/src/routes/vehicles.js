@@ -5,6 +5,11 @@ const router = express.Router();
 
 function nowIso() { return new Date().toISOString(); }
 
+function sameId(a, b) {
+  if (a == null || b == null) return a === b;
+  return String(a) === String(b);
+}
+
 router.get('/', (req, res) => {
   const { status } = req.query;
   let vehicles = db.prepare('SELECT * FROM vehicles').all();
@@ -19,7 +24,7 @@ router.get('/', (req, res) => {
   const result = vehicles.map(v => ({
     ...v,
     upcoming_maintenances: maintenances
-      .filter(m => m.vehicle_id === v.id && (m.end_time || '') >= now)
+      .filter(m => sameId(m.vehicle_id, v.id) && (m.end_time || '') >= now)
       .sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''))
   }));
 
@@ -31,7 +36,7 @@ router.get('/:id', (req, res) => {
   if (!vehicle) {
     return res.status(404).json({ error: '车辆不存在' });
   }
-  const maintenances = db.prepare('SELECT * FROM vehicle_maintenance WHERE vehicle_id = ?').all(req.params.id);
+  const maintenances = db.prepare('SELECT * FROM vehicle_maintenance').all().filter(m => sameId(m.vehicle_id, req.params.id));
   maintenances.sort((a, b) => (b.start_time || '').localeCompare(a.start_time || ''));
   res.json({ ...vehicle, maintenances });
 });
@@ -42,7 +47,7 @@ router.post('/:id/status', (req, res) => {
     return res.status(400).json({ error: '无效的车辆状态' });
   }
   const data = db._data;
-  const idx = data.vehicles.findIndex(v => v.id == req.params.id);
+  const idx = data.vehicles.findIndex(v => sameId(v.id, req.params.id));
   if (idx < 0) {
     return res.status(404).json({ error: '车辆不存在' });
   }
@@ -62,7 +67,7 @@ router.post('/:id/maintenance', (req, res) => {
   }
   const plans = db.prepare('SELECT * FROM broadcast_plans').all();
   const conflict = plans.filter(bp =>
-    bp.vehicle_id == req.params.id
+    sameId(bp.vehicle_id, req.params.id)
     && ['pending', 'dispatched', 'ongoing'].includes(bp.status)
     && bp.start_time < end_time && bp.end_time > start_time
   );
@@ -89,13 +94,13 @@ router.get('/:id/availability', (req, res) => {
   }
   const plans = db.prepare('SELECT * FROM broadcast_plans').all();
   const conflictPlans = plans.filter(bp =>
-    bp.vehicle_id == req.params.id
+    sameId(bp.vehicle_id, req.params.id)
     && ['pending', 'dispatched', 'ongoing'].includes(bp.status)
     && bp.start_time < end_time && bp.end_time > start_time
   );
   const maints = db.prepare('SELECT * FROM vehicle_maintenance').all();
   const conflictMaintenance = maints.filter(m =>
-    m.vehicle_id == req.params.id && m.start_time < end_time && m.end_time > start_time
+    sameId(m.vehicle_id, req.params.id) && m.start_time < end_time && m.end_time > start_time
   );
   res.json({
     available: conflictPlans.length === 0 && conflictMaintenance.length === 0 && vehicle.status !== 'maintenance',

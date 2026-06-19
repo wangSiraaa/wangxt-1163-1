@@ -5,10 +5,15 @@ const router = express.Router();
 
 function nowIso() { return new Date().toISOString(); }
 
+function sameId(a, b) {
+  if (a == null || b == null) return a === b;
+  return String(a) === String(b);
+}
+
 function enrichPlan(p, vehicles, freqs) {
   if (!p) return p;
-  const v = vehicles.find(x => x.id === p.vehicle_id);
-  const f = freqs.find(x => x.id === p.frequency_id);
+  const v = vehicles.find(x => sameId(x.id, p.vehicle_id));
+  const f = freqs.find(x => sameId(x.id, p.frequency_id));
   return {
     ...p,
     vehicle_name: v?.name, vehicle_code: v?.code, vehicle_status: v?.status,
@@ -37,7 +42,7 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: '只有待调度状态的计划可以分配资源' });
   }
 
-  const vehicle = vehicles.find(v => v.id === vehicle_id);
+  const vehicle = vehicles.find(v => sameId(v.id, vehicle_id));
   if (!vehicle) {
     return res.status(404).json({ error: '车辆不存在' });
   }
@@ -50,9 +55,9 @@ router.post('/', (req, res) => {
 
   const allPlans = db.prepare('SELECT * FROM broadcast_plans').all();
   const vehicleConflict = allPlans
-    .filter(bp => bp.vehicle_id === vehicle_id
+    .filter(bp => sameId(bp.vehicle_id, vehicle_id)
       && ['pending', 'dispatched', 'ongoing'].includes(bp.status)
-      && bp.id !== plan_id
+      && !sameId(bp.id, plan_id)
       && bp.start_time < plan.end_time && bp.end_time > plan.start_time)
     .map(bp => enrichPlan(bp, vehicles, freqs));
 
@@ -66,25 +71,25 @@ router.post('/', (req, res) => {
 
   const maintenances = db.prepare('SELECT * FROM vehicle_maintenance').all();
   const maintenanceConflict = maintenances.filter(m =>
-    m.vehicle_id === vehicle_id && m.start_time < plan.end_time && m.end_time > plan.start_time
+    sameId(m.vehicle_id, vehicle_id) && m.start_time < plan.end_time && m.end_time > plan.start_time
   );
   if (maintenanceConflict.length > 0) {
     return res.status(400).json({
-      error: '该车辆在此时段有检修安排',
+      error: '该车辆在此时段有检修安排，无法调度',
       code: 'VEHICLE_MAINTENANCE_SCHEDULED',
       conflicts: maintenanceConflict
     });
   }
 
-  const frequency = freqs.find(f => f.id === frequency_id);
+  const frequency = freqs.find(f => sameId(f.id, frequency_id));
   if (!frequency) {
     return res.status(404).json({ error: '频率不存在' });
   }
 
   const freqConflict = allPlans
-    .filter(bp => bp.frequency_id === frequency_id
+    .filter(bp => sameId(bp.frequency_id, frequency_id)
       && ['pending', 'dispatched', 'ongoing'].includes(bp.status)
-      && bp.id !== plan_id
+      && !sameId(bp.id, plan_id)
       && bp.start_time < plan.end_time && bp.end_time > plan.start_time)
     .map(bp => enrichPlan(bp, vehicles, freqs));
 
@@ -146,9 +151,9 @@ router.get('/', (req, res) => {
   const freqs = db.prepare('SELECT * FROM frequencies').all();
 
   const result = dispatches.map(d => {
-    const bp = plans.find(p => p.id === d.plan_id);
-    const v = vehicles.find(x => x.id === d.vehicle_id);
-    const f = freqs.find(x => x.id === d.frequency_id);
+    const bp = plans.find(p => sameId(p.id, d.plan_id));
+    const v = vehicles.find(x => sameId(x.id, d.vehicle_id));
+    const f = freqs.find(x => sameId(x.id, d.frequency_id));
     return {
       ...d,
       plan_title: bp?.title, start_time: bp?.start_time, end_time: bp?.end_time,
@@ -169,9 +174,9 @@ router.get('/:plan_id', (req, res) => {
   const plans = db.prepare('SELECT * FROM broadcast_plans').all();
   const vehicles = db.prepare('SELECT * FROM vehicles').all();
   const freqs = db.prepare('SELECT * FROM frequencies').all();
-  const bp = plans.find(p => p.id === dispatch.plan_id);
-  const v = vehicles.find(x => x.id === dispatch.vehicle_id);
-  const f = freqs.find(x => x.id === dispatch.frequency_id);
+  const bp = plans.find(p => sameId(p.id, dispatch.plan_id));
+  const v = vehicles.find(x => sameId(x.id, dispatch.vehicle_id));
+  const f = freqs.find(x => sameId(x.id, dispatch.frequency_id));
 
   res.json({
     ...dispatch,
@@ -200,19 +205,19 @@ router.delete('/:plan_id', (req, res) => {
     const data = db._data;
     if (dispatch.vehicle_id) {
       const inUseCount = data.broadcast_plans.filter(p =>
-        p.vehicle_id === dispatch.vehicle_id
+        sameId(p.vehicle_id, dispatch.vehicle_id)
         && ['dispatched', 'ongoing'].includes(p.status)
-        && p.id != req.params.plan_id
+        && !sameId(p.id, req.params.plan_id)
       ).length;
       if (inUseCount === 0) {
-        const idx = data.vehicles.findIndex(v => v.id === dispatch.vehicle_id);
+        const idx = data.vehicles.findIndex(v => sameId(v.id, dispatch.vehicle_id));
         if (idx >= 0) {
           data.vehicles[idx] = { ...data.vehicles[idx], status: 'available', updated_at: nowIso() };
         }
       }
     }
-    data.dispatches = data.dispatches.filter(d => d.plan_id != req.params.plan_id);
-    const pIdx = data.broadcast_plans.findIndex(p => p.id == req.params.plan_id);
+    data.dispatches = data.dispatches.filter(d => !sameId(d.plan_id, req.params.plan_id));
+    const pIdx = data.broadcast_plans.findIndex(p => sameId(p.id, req.params.plan_id));
     if (pIdx >= 0) {
       data.broadcast_plans[pIdx] = {
         ...data.broadcast_plans[pIdx],

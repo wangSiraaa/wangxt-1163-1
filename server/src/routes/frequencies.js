@@ -3,6 +3,11 @@ const db = require('../db');
 
 const router = express.Router();
 
+function sameId(a, b) {
+  if (a == null || b == null) return a === b;
+  return String(a) === String(b);
+}
+
 router.get('/', (req, res) => {
   const { band } = req.query;
   let frequencies = db.prepare('SELECT * FROM frequencies').all();
@@ -22,13 +27,13 @@ router.get('/:id/availability', (req, res) => {
   const vehicles = db.prepare('SELECT * FROM vehicles').all();
   const conflicts = plans
     .filter(bp =>
-      bp.frequency_id == req.params.id
+      sameId(bp.frequency_id, req.params.id)
       && ['pending', 'dispatched', 'ongoing'].includes(bp.status)
       && bp.start_time < end_time && bp.end_time > start_time
-      && (!exclude_plan_id || bp.id != exclude_plan_id)
+      && (!exclude_plan_id || !sameId(bp.id, exclude_plan_id))
     )
     .map(bp => {
-      const v = vehicles.find(x => x.id === bp.vehicle_id);
+      const v = vehicles.find(x => sameId(x.id, bp.vehicle_id));
       return { ...bp, vehicle_name: v?.name, vehicle_code: v?.code };
     });
   res.json({ available: conflicts.length === 0, conflicts });
@@ -51,13 +56,13 @@ router.get('/occupancy', (req, res) => {
   filtered.sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''));
 
   const enriched = filtered.map(bp => {
-    const v = vehicles.find(x => x.id === bp.vehicle_id);
+    const v = vehicles.find(x => sameId(x.id, bp.vehicle_id));
     return { ...bp, vehicle_name: v?.name, vehicle_code: v?.code };
   });
 
   const result = frequencies.map(freq => ({
     ...freq,
-    plans: enriched.filter(p => p.frequency_id === freq.id)
+    plans: enriched.filter(p => sameId(p.frequency_id, freq.id))
   }));
   res.json(result);
 });

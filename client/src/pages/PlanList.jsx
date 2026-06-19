@@ -108,6 +108,44 @@ function PlanList() {
   const handleDispatch = async () => {
     try {
       const values = await dispatchForm.validateFields();
+      if (vehicleAvailable && vehicleAvailable.available === false) {
+        const reasons = [];
+        if (vehicleAvailable.conflict_plans?.length > 0) reasons.push('车辆该时段已有排期');
+        if (vehicleAvailable.conflict_maintenance?.length > 0) reasons.push('车辆该时段有检修安排');
+        if (vehicleAvailable.vehicle_status === 'maintenance') reasons.push('车辆正在检修中');
+        Modal.error({
+          title: '无法下发调度',
+          content: (
+            <div>
+              <p>所选车辆此时段不可用，调度下发被阻止：</p>
+              <ul>
+                {reasons.map((r, i) => <li key={i} style={{ color: '#d4380d' }}>{r}</li>)}
+              </ul>
+              <p style={{ marginTop: 8, fontSize: 12, color: '#888' }}>请更换车辆或调整直播时段后再试。</p>
+            </div>
+          ),
+          okText: '我知道了'
+        });
+        return;
+      }
+      if (freqAvailable && freqAvailable.available === false) {
+        Modal.error({
+          title: '无法下发调度',
+          content: (
+            <div>
+              <p>所选频率此时段已被占用，调度下发被阻止。</p>
+              {freqAvailable.conflicts?.length > 0 && (
+                <p style={{ color: '#d4380d' }}>
+                  冲突：{freqAvailable.conflicts.map(p => `${p.title}(${p.vehicle_code || '未分配'})`).join(', ')}
+                </p>
+              )}
+              <p style={{ marginTop: 8, fontSize: 12, color: '#888' }}>请更换频率后再试。</p>
+            </div>
+          ),
+          okText: '我知道了'
+        });
+        return;
+      }
       await dispatchesApi.create({
         plan_id: selectedPlan.id,
         vehicle_id: values.vehicle_id,

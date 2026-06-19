@@ -5,42 +5,42 @@
       "username": "producer1",
       "name": "张制片",
       "role": "producer",
-      "created_at": "2026-06-19T02:01:15.667Z"
+      "created_at": "2026-06-19T04:43:08.320Z"
     },
     {
       "id": 2,
       "username": "producer2",
       "name": "李制片",
       "role": "producer",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.320Z"
     },
     {
       "id": 3,
       "username": "dispatcher1",
       "name": "王调度",
       "role": "dispatcher",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.320Z"
     },
     {
       "id": 4,
       "username": "dispatcher2",
       "name": "赵调度",
       "role": "dispatcher",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.320Z"
     },
     {
       "id": 5,
       "username": "engineer1",
       "name": "陈工程师",
       "role": "engineer",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.320Z"
     },
     {
       "id": 6,
       "username": "engineer2",
       "name": "刘工程师",
       "role": "engineer",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.320Z"
     }
   ],
   "vehicles": [
@@ -50,8 +50,8 @@
       "name": "1号高清转播车",
       "status": "in_use",
       "description": "8讯道高清转播车",
-      "created_at": "2026-06-19T02:01:15.668Z",
-      "updated_at": "2026-06-19T02:11:58.191Z"
+      "created_at": "2026-06-19T04:43:08.320Z",
+      "updated_at": "2026-06-19T04:43:40.251Z"
     },
     {
       "id": 2,
@@ -59,8 +59,8 @@
       "name": "2号高清转播车",
       "status": "available",
       "description": "6讯道高清转播车",
-      "created_at": "2026-06-19T02:01:15.668Z",
-      "updated_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.320Z",
+      "updated_at": "2026-06-19T04:43:08.320Z"
     },
     {
       "id": 3,
@@ -68,8 +68,8 @@
       "name": "3号4K转播车",
       "status": "available",
       "description": "12讯道4K转播车",
-      "created_at": "2026-06-19T02:01:15.668Z",
-      "updated_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.320Z",
+      "updated_at": "2026-06-19T04:43:08.320Z"
     },
     {
       "id": 4,
@@ -77,8 +77,8 @@
       "name": "4号小型转播车",
       "status": "available",
       "description": "4讯道小型转播车",
-      "created_at": "2026-06-19T02:01:15.668Z",
-      "updated_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z",
+      "updated_at": "2026-06-19T04:43:08.321Z"
     },
     {
       "id": 5,
@@ -86,8 +86,8 @@
       "name": "5号卫星转播车",
       "status": "maintenance",
       "description": "卫星传输转播车-检修中",
-      "created_at": "2026-06-19T02:01:15.668Z",
-      "updated_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z",
+      "updated_at": "2026-06-19T04:43:08.321Z"
     }
   ],
   "frequencies": [
@@ -97,7 +97,7 @@
       "frequency": 470.5,
       "band": "UHF",
       "description": "UHF频段频道1",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z"
     },
     {
       "id": 2,
@@ -105,7 +105,7 @@
       "frequency": 506,
       "band": "UHF",
       "description": "UHF频段频道2",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z"
     },
     {
       "id": 3,
@@ -113,7 +113,7 @@
       "frequency": 542,
       "band": "UHF",
       "description": "UHF频段频道3",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z"
     },
     {
       "id": 4,
@@ -121,7 +121,7 @@
       "frequency": 578,
       "band": "UHF",
       "description": "UHF频段频道4",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z"
     },
     {
       "id": 5,
@@ -129,7 +129,7 @@
       "frequency": 1452,
       "band": "L-Band",
       "description": "L频段频道1",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z"
     },
     {
       "id": 6,
@@ -137,7 +137,7 @@
       "frequency": 1500.5,
       "band": "L-Band",
       "description": "L频段频道2",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z"
     },
     {
       "id": 7,
@@ -145,7 +145,7 @@
       "frequency": 4000,
       "band": "C-Band",
       "description": "C频段频道1",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z"
     },
     {
       "id": 8,
@@ -153,12 +153,60 @@
       "frequency": 4200,
       "band": "C-Band",
       "description": "C频段频道2",
-      "created_at": "2026-06-19T02:01:15.668Z"
+      "created_at": "2026-06-19T04:43:08.321Z"
     }
   ],
   "broadcast_plans": [
     {
       "id": 1,
+      "title": "场景1-被检修包含",
+      "location": "A厅",
+      "start_time": "2026-06-22T11:00:00Z",
+      "end_time": "2026-06-22T13:00:00Z",
+      "producer_id": 1,
+      "producer_name": "张制片",
+      "description": "检修完全包含直播时段",
+      "status": "pending"
+    },
+    {
+      "id": 2,
+      "title": "场景2-部分重叠",
+      "location": "B厅",
+      "start_time": "2026-06-23T09:00:00Z",
+      "end_time": "2026-06-23T11:30:00Z",
+      "producer_id": 1,
+      "producer_name": "张制片",
+      "description": "检修与直播部分重叠",
+      "status": "pending"
+    },
+    {
+      "id": 3,
+      "title": "场景3-相邻不重叠",
+      "location": "C厅",
+      "start_time": "2026-06-24T08:00:00Z",
+      "end_time": "2026-06-24T10:00:00Z",
+      "producer_id": 1,
+      "producer_name": "张制片",
+      "description": "直播结束时检修开始（相邻，不重叠）",
+      "status": "dispatched",
+      "vehicle_id": 1,
+      "frequency_id": 1,
+      "dispatcher_id": 3,
+      "updated_at": "2026-06-19T04:43:15.710Z"
+    },
+    {
+      "id": 4,
+      "title": "场景4-检修中车辆",
+      "location": "D厅",
+      "start_time": "2026-06-25T09:00:00Z",
+      "end_time": "2026-06-25T10:00:00Z",
+      "producer_id": 1,
+      "producer_name": "张制片",
+      "description": "",
+      "status": "pending"
+    },
+    {
+      "id": 5,
       "title": "晚间新闻直播",
       "location": "电视台大厦B厅",
       "start_time": "2026-06-20T19:00:00Z",
@@ -170,15 +218,15 @@
       "vehicle_id": 1,
       "frequency_id": 1,
       "dispatcher_id": 3,
-      "updated_at": "2026-06-19T02:02:49.369Z",
+      "updated_at": "2026-06-19T04:43:40.274Z",
       "engineer_id": 5,
       "engineer_name": "陈工",
-      "started_at": "2026-06-19T02:02:49.365Z",
+      "started_at": "2026-06-19T04:43:40.268Z",
       "signal_quality": "good",
-      "ended_at": "2026-06-19T02:02:49.369Z"
+      "ended_at": "2026-06-19T04:43:40.274Z"
     },
     {
-      "id": 2,
+      "id": 6,
       "title": "冲突测试计划",
       "location": "其他地点",
       "start_time": "2026-06-20T19:30:00Z",
@@ -187,48 +235,32 @@
       "producer_name": "李制片",
       "description": "",
       "status": "pending"
-    },
-    {
-      "id": 3,
-      "title": "测试直播",
-      "location": "测试地点",
-      "start_time": "2026-06-19T03:11:58Z",
-      "end_time": "2026-06-19T05:11:58Z",
-      "producer_id": 1,
-      "producer_name": "张制片",
-      "description": "冒烟测试",
-      "status": "dispatched",
-      "vehicle_id": 1,
-      "frequency_id": 1,
-      "dispatcher_id": 3,
-      "updated_at": "2026-06-19T02:11:58.191Z",
-      "signal_quality": "good"
     }
   ],
   "dispatches": [
     {
       "id": 1,
-      "plan_id": 1,
-      "vehicle_id": 1,
-      "frequency_id": 1,
-      "dispatcher_id": 3,
-      "dispatcher_name": "王调度",
-      "note": "标准配置"
-    },
-    {
-      "id": 2,
       "plan_id": 3,
       "vehicle_id": 1,
       "frequency_id": 1,
       "dispatcher_id": 3,
       "dispatcher_name": "王调度",
       "note": ""
+    },
+    {
+      "id": 2,
+      "plan_id": 5,
+      "vehicle_id": 1,
+      "frequency_id": 1,
+      "dispatcher_id": 3,
+      "dispatcher_name": "王调度",
+      "note": "标准配置"
     }
   ],
   "signal_records": [
     {
       "id": 1,
-      "plan_id": 1,
+      "plan_id": 5,
       "engineer_id": 5,
       "engineer_name": "陈工",
       "signal_strength": 95,
@@ -236,29 +268,32 @@
       "audio_status": "normal",
       "video_status": "normal",
       "note": "",
-      "recorded_at": "2026-06-19T02:02:49.367Z"
+      "recorded_at": "2026-06-19T04:43:40.272Z"
+    }
+  ],
+  "vehicle_maintenance": [
+    {
+      "id": 1,
+      "vehicle_id": "1",
+      "start_time": "2026-06-22T10:00:00Z",
+      "end_time": "2026-06-22T14:00:00Z",
+      "reason": "年检"
     },
     {
       "id": 2,
-      "plan_id": 3,
-      "engineer_id": 5,
-      "engineer_name": "陈工程师",
-      "signal_strength": 85,
-      "signal_quality": "good",
-      "audio_status": "normal",
-      "video_status": "normal",
-      "note": "",
-      "recorded_at": "2026-06-19T02:11:58.202Z"
+      "vehicle_id": "1",
+      "start_time": "2026-06-23T10:30:00Z",
+      "end_time": "2026-06-23T12:30:00Z",
+      "reason": "天线校准"
     }
   ],
-  "vehicle_maintenance": [],
   "_seq": {
     "users": 6,
     "vehicles": 5,
     "frequencies": 8,
-    "broadcast_plans": 3,
+    "broadcast_plans": 6,
     "dispatches": 2,
-    "signal_records": 2,
-    "vehicle_maintenance": 0
+    "signal_records": 1,
+    "vehicle_maintenance": 2
   }
 }
